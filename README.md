@@ -3,7 +3,7 @@
 ![Version](https://img.shields.io/badge/version-Alpha_V3.6-red)
 ![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
 ![Stack](https://img.shields.io/badge/Stack-React%20%7C%20FastAPI%20%7C%20Go-black)
-![License](https://img.shields.io/badge/license-MIT-blue)
+![License](https://img.shields.io/badge/license-GPLv3-blue)
 
 **BlackHound K9** is a local-first, AI-powered Offensive Security orchestration suite. It chains 10 battle-tested Go tools into a highly resilient, deterministic pipeline, strips away terminal noise, and uses Context-Aware AI to triage tens of thousands of findings into actionable bug bounty reports.
 
