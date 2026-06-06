@@ -32,7 +32,7 @@
     <!-- Navbar -->
     <nav class="w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center z-10">
         <div class="flex items-center gap-3">
-            <img src="logo.png" alt="BlackHound Logo" class="w-10 h-10">
+            <img src="logo.png" alt="BlackHound Logo" class="w-20 h-20 object-contain">
             <span class="text-xl font-bold tracking-wider">BLACKHOUND <span class="text-brand">K9</span></span>
         </div>
         <div class="flex gap-6 items-center text-sm font-medium">
@@ -98,7 +98,10 @@
             <p class="mt-4"><span class="text-slate-500"># 2. Enter the directory</span></p>
             <p>cd BlackHound-K9</p>
             <p class="mt-4"><span class="text-slate-500"># 3. Launch the hounds</span></p>
-            <p>docker compose up --build</p>
+            <p>docker compose up -d --build</p>
+            <p class="mt-4"><span class="text-slate-500"># 4. Access the command center</span></p>
+            <p>Navigate to http://localhost:5173</p>
+
         </div>
     </section>
 
