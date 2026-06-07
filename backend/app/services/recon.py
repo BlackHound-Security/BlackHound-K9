@@ -250,11 +250,25 @@ async def run_pipeline(targets, threads, scan_depth, api_url, api_key, model_nam
         
         # Extract base URLs from gau and katana without params for x8
         x8_urls = set()
+        import urllib.parse
+        junk_exts = (".png", ".jpg", ".jpeg", ".gif", ".css", ".svg", ".ico", ".woff", ".woff2", ".ttf", ".eot", ".mp4", ".mp3", ".avi", ".pdf")
+        
+        def is_clean_url(u: str) -> bool:
+            u = u.strip()
+            if not u.startswith("http"): return False
+            if "%" in u or "[" in u or "{" in u or "<" in u or ">" in u: return False
+            try:
+                path = urllib.parse.urlparse(u).path.lower()
+                if path.endswith(junk_exts): return False
+            except:
+                return False
+            return True
+
         try:
             if (WORKSPACE_DIR / "gau.txt").exists():
                 for line in (WORKSPACE_DIR / "gau.txt").read_text(errors="ignore").splitlines():
                     if "?" in line: line = line.split("?")[0]
-                    x8_urls.add(line.strip())
+                    if is_clean_url(line): x8_urls.add(line.strip())
             if (WORKSPACE_DIR / "katana.json").exists():
                 for line in (WORKSPACE_DIR / "katana.json").read_text(errors="ignore").splitlines():
                     try:
@@ -262,12 +276,14 @@ async def run_pipeline(targets, threads, scan_depth, api_url, api_key, model_nam
                         ep = o.get("request", {}).get("endpoint") or o.get("endpoint")
                         if ep:
                             if "?" in ep: ep = ep.split("?")[0]
-                            x8_urls.add(ep.strip())
+                            if is_clean_url(ep): x8_urls.add(ep.strip())
                     except: pass
         except: pass
         
         if x8_urls:
-            x8_targets_file.write_text("\n".join(x8_urls))
+            capped_urls = sorted(list(x8_urls))[:500]
+            x8_targets_file.write_text("\n".join(capped_urls))
+            await ws_manager.broadcast(f"[*] x8 Deduplication: Filtered raw endpoints down to {len(capped_urls)} clean base paths.")
             x8_cmd = ["/usr/local/bin/x8", "-u", str(x8_targets_file), "-w", str(wordlist_file), "-O", "json", "-o", str(WORKSPACE_DIR / "x8.json"), "-W", safe_threads]
             await run_tool(x8_cmd, "x8.log", timeout=3600, proxy_url=proxy_url)
 
