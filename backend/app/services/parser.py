@@ -29,7 +29,15 @@ def parse_ports() -> List[Finding]:
     return [Finding(type="Open Port", value=l.strip(), severity="Info") for l in (WORKSPACE_DIR / "ports.txt").read_text(errors="ignore").splitlines() if ":" in l] if (WORKSPACE_DIR / "ports.txt").exists() else []
 
 def parse_ffuf() -> List[Finding]:
-    return [Finding(type="Directory", value=e.get("url") or e.get("input",{}).get("FUZZ") or "", severity="Low") for e in (_safe_read_json(WORKSPACE_DIR / "ffuf.json").get("results", []) if isinstance(_safe_read_json(WORKSPACE_DIR / "ffuf.json"), dict) else [])]
+    findings = []
+    data = _safe_read_json(WORKSPACE_DIR / "ffuf.json")
+    results = data.get("results", []) if isinstance(data, dict) else []
+    for e in results:
+        url = e.get("url") or e.get("input", {}).get("FUZZ") or ""
+        status = e.get("status", "Unknown")
+        if url:
+            findings.append(Finding(type=f"Directory [HTTP {status}]", value=url, severity="Low"))
+    return findings
 
 def parse_vhost(targets: List[str]) -> List[Finding]:
     findings = []
@@ -190,7 +198,7 @@ async def analyze_findings_with_ai(findings: List[Finding], api_url, api_key, mo
 
     client = AsyncOpenAI(api_key=resolved_key, base_url=resolved_url)
     
-    from app.services.recon import target_domain, WORKSPACE_DIR
+    from app.services.recon import WORKSPACE_DIR
     import json
     
     for i in range(0, len(items_to_process), 50):
@@ -202,7 +210,7 @@ Nuclei findings already have accurate severities—do NOT change them.
 For all other findings, you MUST apply Context-Aware Heuristics:
 1. Subdomain Context: A finding on 'dev.', 'staging.', or 'admin.' is higher severity than 'www.'.
 2. Port Context: Port 80/443 is Info. Exposed databases (3306, 5432), management ports (22, 2082), or weird high ports should be Medium/High.
-3. File/Directory Context: Generic paths (images, css) are Info. Exposure of source code (.git), environment variables (.env), config files, or admin panels are High/Critical.
+3. File/Directory Context: Generic paths (images, css) are Info. Sensitive files (.git, .env, .ssh) are High/Critical ONLY IF they are accessible (e.g., [HTTP 200]). If the Type indicates [HTTP 401], [HTTP 403], or [HTTP 404], the server is blocking access, so you MUST downgrade it to Low or Info.
 4. Katana/WhatWeb Context: General framework fingerprints are Info. 
 
 CRITICAL INSTRUCTIONS:
@@ -223,6 +231,10 @@ Findings:
                 temperature=temp, top_p=top_p, extra_body={"top_k": top_k, "min_p": min_p},
                 timeout=120.0
             )
+            
+            if not response or not hasattr(response, 'choices') or not response.choices:
+                raise Exception(f"Invalid API response received (Empty choices or model overload): {response}")
+                
             ai_text = response.choices[0].message.content or "[]"
             parsed_data = extract_json(ai_text)
             if parsed_data is None: parsed_data = []
@@ -239,6 +251,9 @@ Findings:
             await asyncio.sleep(5)
             
         except Exception as e:
-            await ws_manager.broadcast(f"[!] AI enrichment failed: {e}")
+            import traceback
+            tb = traceback.format_exc()
+            print(f"[ERROR] AI enrichment failed:\n{tb}")
+            await ws_manager.broadcast(f"[!] AI enrichment failed: {e}\n{tb}")
             await asyncio.sleep(5)
     return unique_findings

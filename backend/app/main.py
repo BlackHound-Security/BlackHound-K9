@@ -52,7 +52,10 @@ async def _pipeline_wrapper(targets, threads, depth, api_url, api_key, model, te
     except asyncio.CancelledError:
         await ws_manager.broadcast("\n[!] Pipeline script terminated successfully.")
     except Exception as e:
-        await ws_manager.broadcast(f"[!] Pipeline crashed: {e}")
+        import traceback
+        tb = traceback.format_exc()
+        print(f"[ERROR] Pipeline crashed:\n{tb}")
+        await ws_manager.broadcast(f"[!] Pipeline crashed: {e}\n{tb}")
     finally:
         async with scan_lock:
             SCAN_IN_PROGRESS = False

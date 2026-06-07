@@ -137,6 +137,20 @@ def _extract_params():
 
 # SAFE HARBOR PIPELINE UPDATE
 async def run_pipeline(targets, threads, scan_depth, api_url, api_key, model_name, temp, top_k, top_p, min_p, wordlist_categories, custom_headers, rate_limit, toggles, proxy_url, webhook_url):
+    import urllib.parse
+    clean_targets = []
+    for t in targets:
+        t = t.strip()
+        if not t: continue
+        if "://" in t:
+            parsed = urllib.parse.urlparse(t)
+            hostname = parsed.hostname or parsed.netloc.split(":")[0]
+        else:
+            hostname = t.split(":")[0].split("/")[0]
+        if hostname:
+            clean_targets.append(hostname)
+    targets = list(set(clean_targets))
+
     await ws_manager.broadcast(f"[*] Initializing BlackHound K9 (Pro) Pipeline against {len(targets)} targets")
     safe_threads = str(min(int(threads), rate_limit))
     recursion_depth = int(toggles.get("recursion_depth", 0))

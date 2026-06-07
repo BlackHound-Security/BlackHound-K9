@@ -285,14 +285,16 @@ export default function App() {
   }
 
   const handleExportJson = () => {
-    const payload = JSON.stringify({ infrastructure: technologies, vulnerabilities: findings }, null, 2)
+    const importantFindings = findings.filter(f => f.severity !== 'Info' && f.severity !== 'Low')
+    const payload = JSON.stringify({ infrastructure: technologies, vulnerabilities: importantFindings }, null, 2)
     const safeTarget = 'report'
     downloadBlob(`K9_${safeTarget}_findings.json`, payload, 'application/json;charset=utf-8')
     setExportMenuOpen(false)
   }
 
   const handleExportMarkdown = () => {
-    const md = buildMarkdownReport(targets, findings, technologies)
+    const importantFindings = findings.filter(f => f.severity !== 'Info' && f.severity !== 'Low')
+    const md = buildMarkdownReport(targets, importantFindings, technologies)
     const safeTarget = 'report'
     downloadBlob(`K9_${safeTarget}_report.md`, md, 'text/markdown;charset=utf-8')
     setExportMenuOpen(false)
