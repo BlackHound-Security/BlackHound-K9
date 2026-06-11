@@ -3,7 +3,7 @@
 ![Version](https://img.shields.io/badge/version-Alpha_V3.6-red)
 ![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
 ![Stack](https://img.shields.io/badge/Stack-React%20%7C%20FastAPI%20%7C%20Go-black)
-![License](https://img.shields.io/badge/license-GPLv3-red)
+![License](https://img.shields.io/badge/license-AGPL--3.0-red)
 
 **Stop staring at terminals. Let the Hound hunt.** 
 An open-source, AI-orchestrated Attack Surface Management (ASM) and DAST platform that turns chaotic terminal noise into paid bounties.
