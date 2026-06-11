@@ -1,4 +1,4 @@
-# 🐺 BlackHound K9 (Alpha V3.14)
+# 🐺 Unchained K9 (Alpha V3.14)
 
 ![Version](https://img.shields.io/badge/version-Alpha_V3.6-red)
 ![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
@@ -16,7 +16,7 @@ The bug bounty industry is stuck in the past. You are wasting hours writing `gre
 Worse, you are suffering from **Alert Fatigue**. Digging through 66,000 false-positive 403 errors and endless `/api/user/[uuid]` endpoints blinds you to the actual vulnerabilities that pay out. Terminal fatigue kills bugs.
 
 ## 🗡️ The Solution
-**BlackHound K9 isn't a bash script. It is an automated Red Team operator.** 
+**Unchained K9 isn't a bash script. It is an automated Red Team operator.** 
 It orchestrates an arsenal of the industry's most lethal Go tools into a highly OPSEC-safe pipeline, maps the data to a glowing visual heatmap, fires deep-web exploits, and uses an AI Engine to write your HackerOne reports while you sleep.
 
 ### 🔥 V3.14 Arsenal & Features
@@ -31,12 +31,12 @@ It orchestrates an arsenal of the industry's most lethal Go tools into a highly 
 <img width="1171" height="682" alt="image(8)(1)" src="https://github.com/user-attachments/assets/deaac921-ca44-4fec-b3fe-1d92028d1a22" />
 
 ## 🚀 Quick Start (Docker)
-BlackHound K9 is 100% containerized. You do not need to install Python or manage dependency hell on your host machine.
+Unchained K9 is 100% containerized. You do not need to install Python or manage dependency hell on your host machine.
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/BlackHound-Security/BlackHound-K9.git
-cd BlackHound-K9
+git clone https://github.com/Unchained-Security/Unchained-K9.git
+cd Unchained-K9
 
 # 2. Build and launch the hounds (Detached Mode)
 docker compose up -d --build
@@ -47,4 +47,4 @@ http://localhost:5173
 ```
 
 ## ⚠️ Legal Disclaimer
-BlackHound K9 is an offensive security tool designed STRICTLY for authorized bug bounty hunting, penetration testing, and security research. Running these tools against targets without explicit, written permission is illegal. BlackHound Security LLC and the contributors of this project assume no liability and are not responsible for any misuse or damage caused by this program. You accept full responsibility for your actions.
+Unchained K9 is an offensive security tool designed STRICTLY for authorized bug bounty hunting, penetration testing, and security research. Running these tools against targets without explicit, written permission is illegal. Unchained Security LLC and the contributors of this project assume no liability and are not responsible for any misuse or damage caused by this program. You accept full responsibility for your actions.

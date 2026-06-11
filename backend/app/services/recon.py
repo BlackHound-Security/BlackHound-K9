@@ -210,7 +210,7 @@ async def run_pipeline(targets, threads, scan_depth, api_url, api_key, model_nam
             clean_targets.append(hostname)
     targets = list(set(clean_targets))
 
-    await ws_manager.broadcast(f"[*] Initializing BlackHound K9 (Pro) Pipeline against {len(targets)} targets")
+    await ws_manager.broadcast(f"[*] Initializing Unchained K9 (Pro) Pipeline against {len(targets)} targets")
     safe_threads = str(min(int(threads), rate_limit))
     recursion_depth = int(toggles.get("recursion_depth", 0))
 
@@ -526,7 +526,7 @@ async def run_pipeline(targets, threads, scan_depth, api_url, api_key, model_nam
     if webhook_url:
         try:
             req = urllib.request.Request(webhook_url, method="POST", headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
-            summary = f"**BlackHound K9 Scan Completed**\nTargets: {len(targets)}\nVulnerabilities Found: {len(enriched)}"
+            summary = f"**Unchained K9 Scan Completed**\nTargets: {len(targets)}\nVulnerabilities Found: {len(enriched)}"
             payload = {"text": summary} if "hooks.slack.com" in webhook_url else {"content": summary}
             urllib.request.urlopen(req, data=json.dumps(payload).encode("utf-8"), timeout=10)
         except Exception as e:

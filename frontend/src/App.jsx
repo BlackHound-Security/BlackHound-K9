@@ -19,7 +19,7 @@ function downloadBlob(filename, content, type) {
 function buildMarkdownReport(target, findings, technologies) {
   const safeTarget = target?.trim() || 'unknown'
   const severityOrder = ['Critical', 'High', 'Medium', 'Low', 'Info']
-  let md = `# BlackHound K9 Security Report\n\n## Target Summary\n| Field | Value |\n| --- | --- |\n| **Targets** | \`${safeTarget}\` |\n| **Total Findings** | ${findings.length} |\n| **Date Generated** | ${new Date().toUTCString()} |\n\n`
+  let md = `# Unchained K9 Security Report\n\n## Target Summary\n| Field | Value |\n| --- | --- |\n| **Targets** | \`${safeTarget}\` |\n| **Total Findings** | ${findings.length} |\n| **Date Generated** | ${new Date().toUTCString()} |\n\n`
   
   if (technologies && technologies.length > 0) {
     md += `## Infrastructure Profile\n| Category | Technology | Location |\n| --- | --- | --- |\n`
@@ -396,7 +396,7 @@ export default function App() {
           <ShieldAlert className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-2">Legal Disclaimer</h1>
           <p className="text-sm text-slate-300 mb-6 leading-relaxed">
-            BlackHound K9 is an offensive security tool designed STRICTLY for authorized bug bounty hunting. 
+            Unchained K9 is an offensive security tool designed STRICTLY for authorized bug bounty hunting. 
             Running these tools against targets without explicit permission is illegal. By continuing, you accept full responsibility.
           </p>
           <input type="text" value={legalInput} onChange={e=>setLegalInput(e.target.value)} placeholder="Type 'I AGREE' to continue" className="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white text-center mb-4 uppercase" />
@@ -448,7 +448,7 @@ export default function App() {
             </button>
             <div>
               <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-red-600/30 bg-red-700/10 px-3 py-1 text-xs font-medium text-red-400">
-                <Sparkles className="h-3.5 w-3.5" /> BLACKHOUND K9 PRO <span className="text-slate-500">v3.14</span>
+                <Sparkles className="h-3.5 w-3.5" /> UNCHAINED K9 PRO <span className="text-slate-500">v3.14</span>
               </div>
               <h1 className="text-3xl font-semibold text-white">Recon Dashboard</h1>
             </div>

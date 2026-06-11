@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
     await init_db()
     yield
 
-app = FastAPI(title="BlackHound K9 API", version="3.3.0", lifespan=lifespan)
+app = FastAPI(title="Unchained K9 API", version="3.3.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 WORKSPACE_DIR = Path("/workspace")
