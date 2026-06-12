@@ -14,12 +14,14 @@ WORDLIST_URLS = {
     "parameters": ["https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/BurpSuite-ParamMiner/parameter-names.txt"]
 }
 MERGED_WORDLIST = WORKSPACE_DIR / "merged_wordlist.txt"
+PARAM_WORDLIST = WORKSPACE_DIR / "param_wordlist.txt"
 VHOST_WORDLIST_URL = "https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-5000.txt"
 VHOST_WORDLIST = WORKSPACE_DIR / "vhost_wordlist.txt"
 
 def _compile_wordlists(categories: list):
     """Download all selected wordlist categories, merge and deduplicate."""
     all_lines = set()
+    param_lines = set()
     for cat in categories:
         urls = WORDLIST_URLS.get(cat, [])
         for url in urls:
@@ -29,11 +31,16 @@ def _compile_wordlists(categories: list):
                     for line in data.splitlines():
                         line = line.strip()
                         if line and not line.startswith('#'):
-                            all_lines.add(line)
+                            if cat == "parameters":
+                                param_lines.add(line)
+                            else:
+                                all_lines.add(line)
             except Exception:
                 pass
     if all_lines:
         MERGED_WORDLIST.write_text("\n".join(sorted(all_lines)))
+    if param_lines:
+        PARAM_WORDLIST.write_text("\n".join(sorted(param_lines)))
     return len(all_lines)
 
 def _ensure_vhost_wordlist():
@@ -103,7 +110,6 @@ def _extract_params():
                 line = line.strip()
                 if not line: continue
                 try:
-                    import json
                     o = json.loads(line)
                     endpoint = o.get("request", {}).get("endpoint") or o.get("endpoint")
                     if endpoint: process_url(endpoint)
@@ -114,7 +120,6 @@ def _extract_params():
         if (WORKSPACE_DIR / "x8.json").exists():
             x8_data = (WORKSPACE_DIR / "x8.json").read_text(errors="ignore").strip()
             if x8_data:
-                import json
                 try:
                     o = json.loads(x8_data)
                     if isinstance(o, list):
@@ -297,7 +302,6 @@ async def run_pipeline(targets, threads, scan_depth, api_url, api_key, model_nam
                     return await _fetch_and_hash_favicon(u, custom_headers, proxy_url)
             favicon_tasks = [bounded_fetch(t) for t in targets]
             favicon_results = await asyncio.gather(*favicon_tasks, return_exceptions=True)
-            import json
             favicon_data = [f.model_dump() for f in favicon_results if f and not isinstance(f, Exception)]
             if favicon_data:
                 (WORKSPACE_DIR / "favicon.json").write_text(json.dumps(favicon_data))
@@ -317,7 +321,6 @@ async def run_pipeline(targets, threads, scan_depth, api_url, api_key, model_nam
         if toggles.get("run_js_secrets", False) and (WORKSPACE_DIR / "katana.json").exists():
             await ws_manager.broadcast("[*] Running JS Secret Hunting...")
             js_urls = set()
-            import json
             for line in (WORKSPACE_DIR / "katana.json").read_text(errors="ignore").splitlines():
                 try:
                     o = json.loads(line)
@@ -414,7 +417,12 @@ async def run_pipeline(targets, threads, scan_depth, api_url, api_key, model_nam
             capped_urls = sorted(list(x8_urls))[:500]
             x8_targets_file.write_text("\n".join(capped_urls))
             await ws_manager.broadcast(f"[*] x8 Deduplication: Filtered raw endpoints down to {len(capped_urls)} clean base paths.")
-            x8_cmd = ["/usr/local/bin/x8", "-u", str(x8_targets_file), "-w", str(wordlist_file), "-O", "json", "-o", str(WORKSPACE_DIR / "x8.json"), "-W", safe_threads]
+            
+            # Use dedicated PARAM_WORDLIST instead of wordlist_file (MERGED_WORDLIST)
+            from app.services.recon import PARAM_WORDLIST
+            if not PARAM_WORDLIST.exists(): PARAM_WORDLIST.write_text("id\nuser\nadmin\nconfig")
+            
+            x8_cmd = ["/usr/local/bin/x8", "-u", str(x8_targets_file), "-w", str(PARAM_WORDLIST), "-O", "json", "-o", str(WORKSPACE_DIR / "x8.json"), "-W", safe_threads]
             await run_tool(x8_cmd, "x8.log", timeout=3600, proxy_url=proxy_url)
 
     unique_param_count = await asyncio.to_thread(_extract_params)
